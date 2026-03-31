@@ -5,3 +5,10 @@ editor: visual
 ---
 
 ## Github Test
+
+```{r}
+data <- read.csv("IMDB_movie_reviews_details.csv")
+
+head(data)
+
+```
