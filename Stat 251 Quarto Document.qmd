@@ -1,0 +1,7 @@
+---
+title: "Stat 251 Project"
+format: html
+editor: visual
+---
+
+## Stat 251 Bayesian Analysis
