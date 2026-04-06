@@ -50,7 +50,19 @@ hist(filtered_data$gross_millions)
 
 ```
 
+```{r}
 
+fantsyDat <- filtered_data %>%
+  filter(str_detect(genre, regex("Fantasy", ignore_case = TRUE)))
+
+scifiDat <- filtered_data %>%
+  filter(str_detect(genre, regex("Sci-Fi", ignore_case = TRUE)))
+
+
+
+
+
+```
 
 
 
