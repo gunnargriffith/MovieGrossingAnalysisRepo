@@ -78,3 +78,9 @@ par(mfrow = c(1, 1))
 **Likelihood and Model Justification:** We model box office gross using a log-normal distribution. Log-transformed box office grosses for each genre follow approximately normal distributions, as shown in the histograms. The log-normal model is appropriate because it accommodates the right skew present in raw box office data and constrains predictions to positive values.
 
 **Prior Specification:** We specify independent Normal priors on each genre's mean log-gross. For Science Fiction films we suspect a mean of 30 million dollars, and for Fantasy a mean of 20 million dollars.
+
+## Results:
+
+## Discussion:
+
+## Appendix:
