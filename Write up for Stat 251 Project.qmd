@@ -1,0 +1,86 @@
+---
+title: "Stat 251 Project"
+author: 'Trieste Cerny, Isaiah Ka''i Cabrinha, and Gunner Griffth'
+format: html
+editor: visual
+---
+
+## Introduction:
+
+This project investigates which film genre generates greater box office revenue: fantasy or science fiction. Both genres are popular in contemporary cinema and attract substantial investment, yet their relative commercial success remains an open question. Understanding which genre tends to gross more provides value to filmmakers, studios, and investors seeking to allocate resources effectively. Additionally, examining the box office performance of these genres offers insight into audience preferences and the financial viability of different creative directions in the film industry. Our primary research question is: do science fiction films gross significantly more than fantasy films on average? We hypothesize that science fiction films may have a slight edge in box office performance, though we remain open to the data.
+
+## Methods:
+
+**Data Source and Collection:** We obtained movie data from the IMDB Movies Ratings Details dataset, available on Kaggle (<https://www.kaggle.com/datasets/preetviradiya/imdb-movies-ratings-details>). The dataset contains information on thousands of films including title, genre, rating, and worldwide box office gross in millions of dollars. We filtered the dataset to include only films classified as fantasy or science fiction, removing entries with missing or zero gross values. This resulted in 55 fantasy films and 60 science fiction films for analysis.
+
+APPENDIX\*\*\*
+
+```{r setup, include=FALSE}
+# Load packages
+library(dplyr)
+library(stringr)
+
+# Load data
+movies <- read.csv("IMDB_movie_reviews_details.csv")
+
+# Filtering of the data
+filtered_data <- movies %>%
+  filter(str_detect(genre, regex("Fantasy|Sci-Fi", ignore_case = TRUE)))
+
+head(filtered_data)
+length(filtered_data$name)
+
+#Removing empty "gross" and changing it to an int in millions
+
+filtered_data <- filtered_data %>%
+  filter(!is.na(gross), gross != "") %>%
+  mutate(
+    gross_clean = str_remove_all(gross, "[\\$,M]"),
+    gross_millions = as.numeric(gross_clean)
+  ) %>%
+  select(-gross_clean) %>%
+  select(-gross)
+
+
+head(filtered_data)
+```
+
+```{r, echo=FALSE}
+# Separate data sets
+fantasyDat <- filtered_data %>%
+  filter(str_detect(genre, regex("Fantasy", ignore_case = TRUE)))
+
+scifiDat <- filtered_data %>%
+  filter(str_detect(genre, regex("Sci-Fi", ignore_case = TRUE)))
+# Summary stats for each group not on the log scale
+summary(fantasyDat$gross_millions[fantasyDat$gross_millions > 0])
+
+summary(scifiDat$gross_millions[scifiDat$gross_millions > 0])
+```
+
+**Data Summary:**
+
+Fantasy films: minimum 0.06, first quartile 3.67, median 52.04, mean 110.73, third quartile 177.89, maximum 760.51.
+
+Science fiction films: minimum 0.19, first quartile 22.68, median 74.70, mean 149.74, third quartile 226.82, maximum 936.66.
+
+Both distributions are right-skewed with long tails, suggesting the presence of blockbuster films that significantly exceed typical performance. Science fiction films show a higher median (74.70 vs 52.04) and mean (149.74 vs 110.73) gross, indicating potentially stronger average box office performance.
+
+```{r, echo=TRUE, fig.cap="Log Box Office Gross by Genre"}
+par(mfrow = c(1, 2))
+hist(log(fantasyDat$gross_millions[fantasyDat$gross_millions > 0]), 
+     main = "Fantasy Films", xlab = "Log Gross (millions)", breaks = 12)
+hist(log(scifiDat$gross_millions[scifiDat$gross_millions > 0]), 
+     main = "Science Fiction Films", xlab = "Log Gross (millions)", breaks = 12)
+par(mfrow = c(1, 1))
+```
+
+**Likelihood and Model Justification:** We model box office gross using a log-normal distribution. Log-transformed box office grosses for each genre follow approximately normal distributions, as shown in the histograms. The log-normal model is appropriate because it accommodates the right skew present in raw box office data and constrains predictions to positive values.
+
+**Prior Specification:** We specify independent Normal priors on each genre's mean log-gross. For Science Fiction films we suspect a mean of 30 million dollars, and for Fantasy a mean of 20 million dollars.
+
+## Results:
+
+## Discussion:
+
+## Appendix:
