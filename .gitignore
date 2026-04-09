@@ -50,7 +50,6 @@ rsconnect/
 # Quarto output files
 *_files/
 *.html
-*.qmd
 
 # History files
 .Rhistory
