@@ -125,12 +125,24 @@ gibbs_lognormal <- function(x, n_iter = 5000) {
   return(list(mu = mu, sigma2 = sigma2))
 }
 
-fantasyASamples <- gibbs_lognormal(fantasy_log)
+fantasySamples <- gibbs_lognormal(fantasy_log)
 scifiSamples <- gibbs_lognormal(scifi_log)
 
 
 ```
 
 
+```{r}
+diff_mu <- scifiSamples$mu - fantasySamples$mu
 
+ratio <- exp(diff_mu)
+mean(ratio)
+quantile(ratio, c(0.025, 0.975))
+
+```
+```{r}
+plot(scifi_res$mu, type = "l")
+plot(fantasy_res$mu, type = "l")
+
+```
 
