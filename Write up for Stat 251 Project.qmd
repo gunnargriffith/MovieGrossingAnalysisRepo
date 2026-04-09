@@ -9,3 +9,39 @@ editor: visual
 This project investigates which film genre generates greater box office revenue: fantasy or science fiction. Both genres are popular in contemporary cinema and attract substantial investment, yet their relative commercial success remains an open question. Understanding which genre tends to gross more provides value to filmmakers, studios, and investors seeking to allocate resources effectively. Additionally, examining the box office performance of these genres offers insight into audience preferences and the financial viability of different creative directions in the film industry. Our primary research question is: do science fiction films gross significantly more than fantasy films on average? We hypothesize that science fiction films may have a slight edge in box office performance, though we remain open to the data.
 
 ## Methods:
+
+**Data Source and Collection:** We obtained movie data from the IMDB Movies Ratings Details dataset, available on Kaggle (<https://www.kaggle.com/datasets/preetviradiya/imdb-movies-ratings-details>). The dataset contains information on thousands of films including title, genre, rating, and worldwide box office gross in millions of dollars. We filtered the dataset to include only films classified as fantasy or science fiction, removing entries with missing or zero gross values. This resulted in 55 fantasy films and 60 science fiction films for analysis.
+
+APPENDIX\*\*\*
+
+```{r}
+#Removing empty "gross" and changing it to an int in millions
+
+filtered_data <- filtered_data %>%
+  filter(!is.na(gross), gross != "") %>%
+  mutate(
+    gross_clean = str_remove_all(gross, "[\\$,M]"),
+    gross_millions = as.numeric(gross_clean)
+  ) %>%
+  select(-gross_clean) %>%
+  select(-gross)
+
+
+head(filtered_data)
+```
+
+```{r}
+# Summary stats for each group not on the log scale
+summary(fantsyDat$gross_millions[fantsyDat$gross_millions > 0])
+
+summary(scifiDat$gross_millions[scifiDat$gross_millions > 0])
+```
+
+```{r}
+par(mfrow = c(1, 2))
+hist(log(fantsyDat$gross_millions[fantsyDat$gross_millions > 0]), 
+     main = "Fantasy Films", xlab = "Log Gross (millions)", breaks = 12)
+hist(log(scifiDat$gross_millions[scifiDat$gross_millions > 0]), 
+     main = "Science Fiction Films", xlab = "Log Gross (millions)", breaks = 12)
+par(mfrow = c(1, 1))
+```
