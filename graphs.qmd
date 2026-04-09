@@ -12,6 +12,7 @@ data <- read.csv("IMDB_movie_reviews_details.csv")
 head(data)
 
 ```
+
 ```{r}
 #Data set only including Fantasy or Sci-fi in the genre
 library(dplyr)
@@ -64,13 +65,43 @@ scifiDat <- filtered_data %>%
 
 ```
 
+```{r}
+summary(fantsyDat$gross_millions)
+summary(scifiDat$gross_millions)
+```
 
+```{r}
+hist(fantsyDat$gross_millions, main="Fantasy Gross")
+hist(scifiDat$gross_millions, main="Sci-Fi Gross")
+```
 
+Might need a log-transformation
 
+```{r}
+fantasy_log <- log(fantsyDat$gross_millions)
+scifi_log <- log(scifiDat$gross_millions)
 
+summary(fantasy_log)
+summary(scifi_log)
+```
 
+```{r}
+length(fantasy_log)
+length(scifi_log)
+```
 
+```{r}
+# Remove zeros (movies with $0 gross listed)
+fantasy_log <- log(fantsyDat$gross_millions[fantsyDat$gross_millions > 0])
+scifi_log <- log(scifiDat$gross_millions[scifiDat$gross_millions > 0])
 
+# Now check
+summary(fantasy_log)
+summary(scifi_log)
+length(fantasy_log)
+length(scifi_log)
+```
 
-
-
+```{r}
+mean(fantasy_log)
+```
