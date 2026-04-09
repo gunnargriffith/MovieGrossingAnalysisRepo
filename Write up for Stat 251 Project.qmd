@@ -75,12 +75,41 @@ hist(log(scifiDat$gross_millions[scifiDat$gross_millions > 0]),
 par(mfrow = c(1, 1))
 ```
 
-**Likelihood and Model Justification:** We model box office gross using a log-normal distribution. Log-transformed box office grosses for each genre follow approximately normal distributions, as shown in the histograms. The log-normal model is appropriate because it accommodates the right skew present in raw box office data and constrains predictions to positive values.
+**Likelihood and Model Justification:** We model box office gross using a log-normal distribution. Log-transformed box office grosses for each genre follow approximately normal distributions, as shown in the histograms. The log-normal model is appropriate because it accommodates the right skew present in raw box office data and constrains predictions to positive values. We model movie revenues letting Yi be movie gross revenue and define (Xi = log(Yi)). We assume:
 
-**Prior Specification:** We specify independent Normal priors on each genre's mean log-gross. For Science Fiction films we suspect a mean of 30 million dollars, and for Fantasy a mean of 20 million dollars.
+$$
+X_i \sim \mathcal{N}(\mu, \sigma^2)
+$$
+
+where μ represents the average log revenue for a genre and σ² represents variability in log revenue. The parameter μ is the key quantity for answering our research question, since comparing μ between sci-fi and fantasy films indicates which genre tends to generate higher typical revenue.
+
+**Prior Specification:**
+
+We place independent Normal–Inverse-Gamma priors on the parameters:
+
+$$
+\mu \mid \sigma^2 \sim \mathcal{N}(m,v), \quad
+\sigma^2 \sim \text{Inverse-Gamma}(a,b)
+$$
+
+We use weakly informative priors. Based on expected revenues, we set: m = 17.2 for sci-fi (30M) and m = 16.8 for fantasy (20M) and v = 1 for both so the data dominates. Then we set the priors for both of our inverse gamma distributions to be a = 2 and b= 1 for a flexible variance prior
+
+Finally, we compare posterior distributions of μ across genres, where higher μ indicates higher typical revenue, and evaluate:
+
+$$
+P(\mu_{\text{sci-fi}} > \mu_{\text{fantasy}})
+$$
+
+to answer the research question.
 
 ## Results:
 
+The posterior probability that sci-fi movies have higher typical revenue than fantasy movies is 0.962, indicating strong evidence in favor of sci-fi films. The estimated ratio of typical revenues is 1.94, suggesting that sci-fi movies earn about 1.94 times as much as fantasy movies on average. A 95% credible interval for this ratio is (0.95, 3.60), indicating that sci-fi films may earn anywhere from slightly less to substantially more than fantasy films, though the overall evidence favors higher revenues for sci-fi.
+
+![](images/clipboard-2060738171.png)
+
 ## Discussion:
+
+Overall our research involving comparisons, utilizing Gibbs sampler with convergence and good mixing evident, provided evidence that science fiction films gross significantly more than fantasy films. Some shortcomings of our work were that a lot more variables other than genre contribute to a films gross revenue that we didn't cover. Such as, marketing, sequels, budget, and so on. Further research could be done exploring those other variables and features within a film to truly estimate the differences between both types of films.
 
 ## Appendix:
