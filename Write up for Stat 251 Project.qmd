@@ -37,6 +37,14 @@ summary(fantsyDat$gross_millions[fantsyDat$gross_millions > 0])
 summary(scifiDat$gross_millions[scifiDat$gross_millions > 0])
 ```
 
+**Data Summary:**
+
+Fantasy films: minimum 0.06, first quartile 3.67, median 52.04, mean 110.73, third quartile 177.89, maximum 760.51.
+
+Science fiction films: minimum 0.19, first quartile 22.68, median 74.70, mean 149.74, third quartile 226.82, maximum 936.66.
+
+Both distributions are right-skewed with long tails, suggesting the presence of blockbuster films that significantly exceed typical performance. Science fiction films show a higher median (74.70 vs 52.04) and mean (149.74 vs 110.73) gross, indicating potentially stronger average box office performance.
+
 ```{r}
 par(mfrow = c(1, 2))
 hist(log(fantsyDat$gross_millions[fantsyDat$gross_millions > 0]), 
@@ -45,3 +53,7 @@ hist(log(scifiDat$gross_millions[scifiDat$gross_millions > 0]),
      main = "Science Fiction Films", xlab = "Log Gross (millions)", breaks = 12)
 par(mfrow = c(1, 1))
 ```
+
+**Likelihood and Model Justification:** We model box office gross using a log-normal distribution. Log-transformed box office grosses for each genre follow approximately normal distributions, as shown in the histograms. The log-normal model is appropriate because it accommodates the right skew present in raw box office data and constrains predictions to positive values.
+
+**Prior Specification:** We specify independent Normal priors on each genre's mean log-gross. For Science Fiction films we suspect a mean of 30 million dollars, and for Fantasy a mean of 20 million dollars.
