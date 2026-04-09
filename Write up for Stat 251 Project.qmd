@@ -1,5 +1,6 @@
 ---
-title: "Write up for Stat 251 Project"
+title: "Stat 251 Project"
+author: 'Trieste Cerny, Isaiah Ka''i Cabrinha, and Gunner Griffth'
 format: html
 editor: visual
 ---
@@ -14,7 +15,21 @@ This project investigates which film genre generates greater box office revenue:
 
 APPENDIX\*\*\*
 
-```{r}
+```{r setup, include=FALSE}
+# Load packages
+library(dplyr)
+library(stringr)
+
+# Load data
+movies <- read.csv("IMDB_movie_reviews_details.csv")
+
+# Filtering of the data
+filtered_data <- movies %>%
+  filter(str_detect(genre, regex("Fantasy|Sci-Fi", ignore_case = TRUE)))
+
+head(filtered_data)
+length(filtered_data$name)
+
 #Removing empty "gross" and changing it to an int in millions
 
 filtered_data <- filtered_data %>%
@@ -30,9 +45,15 @@ filtered_data <- filtered_data %>%
 head(filtered_data)
 ```
 
-```{r}
+```{r, echo=FALSE}
+# Separate data sets
+fantasyDat <- filtered_data %>%
+  filter(str_detect(genre, regex("Fantasy", ignore_case = TRUE)))
+
+scifiDat <- filtered_data %>%
+  filter(str_detect(genre, regex("Sci-Fi", ignore_case = TRUE)))
 # Summary stats for each group not on the log scale
-summary(fantsyDat$gross_millions[fantsyDat$gross_millions > 0])
+summary(fantasyDat$gross_millions[fantasyDat$gross_millions > 0])
 
 summary(scifiDat$gross_millions[scifiDat$gross_millions > 0])
 ```
@@ -45,9 +66,9 @@ Science fiction films: minimum 0.19, first quartile 22.68, median 74.70, mean 14
 
 Both distributions are right-skewed with long tails, suggesting the presence of blockbuster films that significantly exceed typical performance. Science fiction films show a higher median (74.70 vs 52.04) and mean (149.74 vs 110.73) gross, indicating potentially stronger average box office performance.
 
-```{r}
+```{r, echo=TRUE, fig.cap="Log Box Office Gross by Genre"}
 par(mfrow = c(1, 2))
-hist(log(fantsyDat$gross_millions[fantsyDat$gross_millions > 0]), 
+hist(log(fantasyDat$gross_millions[fantasyDat$gross_millions > 0]), 
      main = "Fantasy Films", xlab = "Log Gross (millions)", breaks = 12)
 hist(log(scifiDat$gross_millions[scifiDat$gross_millions > 0]), 
      main = "Science Fiction Films", xlab = "Log Gross (millions)", breaks = 12)
