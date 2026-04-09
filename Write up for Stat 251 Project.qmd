@@ -1,0 +1,11 @@
+---
+title: "Write up for Stat 251 Project"
+format: html
+editor: visual
+---
+
+## Introduction:
+
+This project investigates which film genre generates greater box office revenue: fantasy or science fiction. Both genres are popular in contemporary cinema and attract substantial investment, yet their relative commercial success remains an open question. Understanding which genre tends to gross more provides value to filmmakers, studios, and investors seeking to allocate resources effectively. Additionally, examining the box office performance of these genres offers insight into audience preferences and the financial viability of different creative directions in the film industry. Our primary research question is: do science fiction films gross significantly more than fantasy films on average? We hypothesize that science fiction films may have a slight edge in box office performance, though we remain open to the data.
+
+## Methods:
