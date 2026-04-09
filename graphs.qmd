@@ -78,9 +78,59 @@ hist(scifiDat$gross_millions, main="Sci-Fi Gross")
 Might need a log-transformation
 
 ```{r}
-fantasy_log <- log(fantsyDat$gross_millions)
-scifi_log <- log(scifiDat$gross_millions)
+fantasy_log <- log(fantsyDat$gross_millions +1)
+scifi_log <- log(scifiDat$gross_millions +1)
 
 summary(fantasy_log)
 summary(scifi_log)
 ```
+```{r}
+gibbs_lognormal <- function(x, n_iter = 5000) {
+  
+  n <- length(x)
+  
+  # Hyperparameters (weakly informative)
+  mu0 <- 0
+  kappa0 <- 0.01
+  alpha0 <- 2
+  beta0 <- 2
+  
+  # Storage
+  mu <- numeric(n_iter)
+  sigma2 <- numeric(n_iter)
+  
+  # Initialize
+  mu[1] <- mean(x)
+  sigma2[1] <- var(x)
+  
+  for (t in 2:n_iter) {
+    
+    #Sample mu | sigma2
+    kappa_n <- kappa0 + n
+    mu_n <- (kappa0 * mu0 + n * mean(x)) / kappa_n
+    
+    mu[t] <- rnorm(1,
+                   mean = mu_n,
+                   sd = sqrt(sigma2[t-1] / kappa_n))
+    
+    #Sample sigma2 | mu, x
+    alpha_n <- alpha0 + n / 2
+    beta_n <- beta0 + 0.5 * sum((x - mu[t])^2)
+    
+    sigma2[t] <- 1 / rgamma(1,
+                           shape = alpha_n,
+                           rate = beta_n)
+  }
+  
+  return(list(mu = mu, sigma2 = sigma2))
+}
+
+fantasyASamples <- gibbs_lognormal(fantasy_log)
+scifiSamples <- gibbs_lognormal(scifi_log)
+
+
+```
+
+
+
+
