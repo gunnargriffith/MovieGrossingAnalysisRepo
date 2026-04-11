@@ -112,4 +112,168 @@ The posterior probability that sci-fi movies have higher typical revenue than fa
 
 Overall our research involving comparisons, utilizing Gibbs sampler with convergence and good mixing evident, provided evidence that science fiction films gross significantly more than fantasy films. Some shortcomings of our work were that a lot more variables other than genre contribute to a films gross revenue that we didn't cover. Such as, marketing, sequels, budget, and so on. Further research could be done exploring those other variables and features within a film to truly estimate the differences between both types of films.
 
-## Appendix:
+## Appendix: 
+
+All the R code we used to filter, simulate and graph the data:
+(I removed it from he R block so I can render without re running everything.)
+
+data <- read.csv("IMDB_movie_reviews_details.csv")
+
+#Data set only including Fantasy or Sci-fi in the genre
+library(dplyr)
+library(stringr)
+
+filtered_data <- data %>%
+  filter(str_detect(genre, regex("Fantasy|Sci-Fi", ignore_case = TRUE)))
+
+head(filtered_data)
+length(filtered_data$name)
+
+filtered_data <- filtered_data %>%
+  filter(!is.na(gross), gross != "") %>%
+  mutate(
+    gross_clean = str_remove_all(gross, "[\\$,M]"),
+    gross_millions = as.numeric(gross_clean)
+  ) %>%
+  select(-gross_clean) %>%
+  select(-gross)
+
+hist(filtered_data$gross_millions)
+
+fantsyDat <- filtered_data %>%
+  filter(str_detect(genre, regex("Fantasy", ignore_case = TRUE)))
+
+scifiDat <- filtered_data %>%
+  filter(str_detect(genre, regex("Sci-Fi", ignore_case = TRUE)))
+
+summary(fantsyDat$gross_millions)
+summary(scifiDat$gross_millions)
+
+hist(fantsyDat$gross_millions, main="Fantasy Gross")
+hist(scifiDat$gross_millions, main="Sci-Fi Gross")
+
+fantasy_log <- log(fantsyDat$gross_millions +1)
+scifi_log <- log(scifiDat$gross_millions +1)
+
+summary(fantasy_log)
+summary(scifi_log)
+
+
+gibbs_lognormals <- function(x, n_iter = 5000) {
+  
+  n <- length(x)
+  
+  # Hyperparameters (weakly informative)
+  mu0 <- 17.2
+  kappa0 <- 1
+  alpha0 <- 2
+  beta0 <- 1
+  
+  # Storage
+  mu <- numeric(n_iter)
+  sigma2 <- numeric(n_iter)
+  
+  # Initialize
+  mu[1] <- mean(x)
+  sigma2[1] <- var(x)
+  
+  for (t in 2:n_iter) {
+    
+    #Sample mu | sigma2
+    kappa_n <- kappa0 + n
+    mu_n <- (kappa0 * mu0 + n * mean(x)) / kappa_n
+    
+    mu[t] <- rnorm(1,
+                   mean = mu_n,
+                   sd = sqrt(sigma2[t-1] / kappa_n))
+    
+    #Sample sigma2 | mu, x
+    alpha_n <- alpha0 + n / 2
+    beta_n <- beta0 + 0.5 * sum((x - mu[t])^2)
+    
+    sigma2[t] <- 1 / rgamma(1,
+                           shape = alpha_n,
+                           rate = beta_n)
+  }
+  
+  return(list(mu = mu, sigma2 = sigma2))
+}
+
+gibbs_lognormalf <- function(x, n_iter = 5000) {
+  
+  n <- length(x)
+  
+  # Hyperparameters
+  mu0 <- 16.8
+  kappa0 <- 1
+  alpha0 <- 2
+  beta0 <- 1
+  
+  # Storage
+  mu <- numeric(n_iter)
+  sigma2 <- numeric(n_iter)
+  
+  # Initialize
+  mu[1] <- mean(x)
+  sigma2[1] <- var(x)
+  
+  for (t in 2:n_iter) {
+    
+    #Sample mu | sigma2
+    kappa_n <- kappa0 + n
+    mu_n <- (kappa0 * mu0 + n * mean(x)) / kappa_n
+    
+    mu[t] <- rnorm(1,
+                   mean = mu_n,
+                   sd = sqrt(sigma2[t-1] / kappa_n))
+    
+    #Sample sigma2 | mu, x
+    alpha_n <- alpha0 + n / 2
+    beta_n <- beta0 + 0.5 * sum((x - mu[t])^2)
+    
+    sigma2[t] <- 1 / rgamma(1,
+                           shape = alpha_n,
+                           rate = beta_n)
+  }
+  
+  return(list(mu = mu, sigma2 = sigma2))
+}
+
+fantasySamples <- gibbs_lognormalf(fantasy_log)
+scifiSamples <- gibbs_lognormals(scifi_log)
+
+diff_mu <- scifiSamples$mu - fantasySamples$mu
+
+ratio <- exp(diff_mu)
+mean(ratio)
+quantile(ratio, c(0.025, 0.975))
+mean(diff_mu > 0)
+
+plot(scifiSamples$mu, type = "l")
+plot(fantasySamples$mu, type = "l")
+acf(fantasySamples$mu)
+acf(scifiSamples$mu)
+
+
+# Prior simulation
+n_sim <- 5000
+
+mu_scifi_prior <- rnorm(n_sim, mean = 17.2, sd = 1)
+mu_fantasy_prior <- rnorm(n_sim, mean = 16.8, sd = 1)
+
+ratio_prior <- exp(mu_scifi_prior - mu_fantasy_prior)
+
+ratio <- exp(scifiSamples$mu - fantasySamples$mu)
+
+
+
+plot(density(ratio), lwd = 2,
+     main = "Prior vs Posterior: Revenue Ratio",
+     xlab = "Revenue Ratio")
+
+lines(density(ratio_prior), lty = 2, lwd = 2)
+
+legend("topright",
+       legend = c("Posterior", "Prior"),
+       lwd = 2,
+       lty = c(1, 2))
