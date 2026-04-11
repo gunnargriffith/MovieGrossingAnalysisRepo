@@ -1,6 +1,6 @@
 ---
 title: "Stat 251 Project"
-author: 'Trieste Cerny, Isaiah Ka''i Cabrinha, and Gunner Griffth'
+author: 'Trieste Cerny, Isaiah Ka''i Cabrinha, and Gunnar Griffith'
 format: html
 editor: visual
 ---
